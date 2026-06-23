@@ -11,6 +11,15 @@ export interface LoginDto {
   password: string;
 }
 
+export interface ForgotPasswordDto {
+  email: string;
+}
+
+export interface ResetPasswordDto {
+  token: string;
+  newPassword: string;
+}
+
 export interface JwtPayload {
   sub: string;
   email: string;

@@ -9,6 +9,12 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET is required"),
   REDIS_URL: z.string().min(1, "REDIS_URL is required"),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  FRONTEND_URL: z.string().default("http://localhost:3000"),
+  SMTP_HOST: z.string().min(1, "SMTP_HOST is required"),
+  SMTP_PORT: z.coerce.number().default(587),
+  SMTP_USER: z.string().min(1, "SMTP_USER is required"),
+  SMTP_PASS: z.string().min(1, "SMTP_PASS is required"),
+  SMTP_FROM: z.string().default("CRM <no-reply@crm.local>"),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),

@@ -6,7 +6,14 @@ import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { findUserById } from "./auth.repository.js";
-import { login, refreshAccessToken, register, toSafeUser } from "./auth.service.js";
+import {
+  login,
+  refreshAccessToken,
+  register,
+  requestPasswordReset,
+  resetPassword,
+  toSafeUser,
+} from "./auth.service.js";
 import type { AuthTokens } from "./auth.types.js";
 
 const setRefreshCookie = (res: Response, tokens: AuthTokens): void => {
@@ -50,6 +57,18 @@ export const refreshHandler = asyncHandler(async (req: Request, res: Response) =
 export const logoutHandler = asyncHandler(async (_req: Request, res: Response) => {
   res.clearCookie(APP_CONSTANTS.REFRESH_TOKEN_COOKIE, COOKIE_OPTIONS);
   res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, "Logged out successfully"));
+});
+
+export const forgotPasswordHandler = asyncHandler(async (req: Request, res: Response) => {
+  await requestPasswordReset(req.body);
+  res
+    .status(HTTP_STATUS.OK)
+    .json(new ApiResponse(HTTP_STATUS.OK, "If that email exists, a reset link has been sent"));
+});
+
+export const resetPasswordHandler = asyncHandler(async (req: Request, res: Response) => {
+  await resetPassword(req.body);
+  res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, "Password reset successfully"));
 });
 
 export const meHandler = asyncHandler(async (req: Request, res: Response) => {

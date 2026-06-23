@@ -1,17 +1,29 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { APP_CONSTANTS } from "../../constants/APP_CONSTANTS.js";
 import { ERROR_MESSAGES } from "../../constants/ERROR_MESSAGES.js";
 import { HTTP_STATUS } from "../../constants/HTTP_STATUS.js";
 import type { Role } from "../../constants/ROLES.js";
 import { env } from "../../config/env.js";
+import { sendPasswordResetEmail } from "../../lib/mailer.js";
 import { ApiError } from "../../utils/ApiError.js";
-import { createUser, findUserByEmail, findUserById } from "./auth.repository.js";
+import {
+  clearPasswordResetToken,
+  createUser,
+  findUserByEmail,
+  findUserByResetToken,
+  findUserById,
+  setPasswordResetToken,
+  updateUserPassword,
+} from "./auth.repository.js";
 import type {
   AuthTokens,
+  ForgotPasswordDto,
   JwtPayload,
   LoginDto,
   RegisterDto,
+  ResetPasswordDto,
   SafeUser,
 } from "./auth.types.js";
 
@@ -82,4 +94,31 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AuthToke
   }
 
   return generateTokens({ sub: user.id, email: user.email, role: user.role });
+};
+
+const hashToken = (token: string): string => crypto.createHash("sha256").update(token).digest("hex");
+
+export const requestPasswordReset = async (dto: ForgotPasswordDto): Promise<void> => {
+  const user = await findUserByEmail(dto.email);
+  if (!user) {
+    return;
+  }
+
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + APP_CONSTANTS.PASSWORD_RESET_TOKEN_TTL_MINUTES * 60 * 1000);
+  await setPasswordResetToken(user.id, hashToken(rawToken), expiresAt);
+
+  const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${rawToken}`;
+  await sendPasswordResetEmail(user.email, resetUrl);
+};
+
+export const resetPassword = async (dto: ResetPasswordDto): Promise<void> => {
+  const user = await findUserByResetToken(hashToken(dto.token));
+  if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+    throw new ApiError(HTTP_STATUS.BAD_REQUEST, "Invalid or expired reset token");
+  }
+
+  const passwordHash = await bcrypt.hash(dto.newPassword, APP_CONSTANTS.BCRYPT_SALT_ROUNDS);
+  await updateUserPassword(user.id, passwordHash);
+  await clearPasswordResetToken(user.id);
 };
