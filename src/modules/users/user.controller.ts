@@ -4,7 +4,7 @@ import { HTTP_STATUS } from "../../constants/HTTP_STATUS.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { changePassword, listUsers, updateProfile } from "./user.service.js";
+import { changePassword, listAssignableUsers, listUsers, updateProfile } from "./user.service.js";
 import type { ListUsersQuery } from "./user.types.js";
 
 export const updateProfileHandler = asyncHandler(async (req: Request, res: Response) => {
@@ -28,4 +28,9 @@ export const changePasswordHandler = asyncHandler(async (req: Request, res: Resp
 export const listUsersHandler = asyncHandler(async (req: Request, res: Response) => {
   const result = await listUsers(req.query as unknown as ListUsersQuery);
   res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, "Users fetched successfully", result));
+});
+
+export const listAssignableUsersHandler = asyncHandler(async (_req: Request, res: Response) => {
+  const users = await listAssignableUsers();
+  res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, "Users fetched successfully", users));
 });

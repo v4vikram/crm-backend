@@ -17,6 +17,26 @@ enum Role {
   MEMBER
 }
 
+enum LeadSource {
+  WEBSITE
+  FACEBOOK
+  GOOGLE_ADS
+  REFERRAL
+  PHONE_CALL
+  WALK_IN
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
+  LOST
+}
+
 model User {
   id                   String    @id @default(uuid())
   name                 String
@@ -28,5 +48,33 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
+  assignedLeads Lead[] @relation("LeadAssignedTo")
+  createdLeads  Lead[] @relation("LeadCreatedBy")
+
   @@map("users")
+}
+
+model Lead {
+  id           String     @id @default(uuid())
+  companyName  String?
+  contactName  String
+  email        String?
+  phone        String?
+  website      String?
+  source       LeadSource @default(OTHER)
+  status       LeadStatus @default(NEW)
+  remarks      String?
+  assignedToId String?
+  assignedTo   User?      @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  createdById  String
+  createdBy    User       @relation("LeadCreatedBy", fields: [createdById], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([source])
+  @@index([createdAt])
+  @@map("leads")
 }

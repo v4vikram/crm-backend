@@ -8,6 +8,7 @@ import { httpLogger } from "./config/logger.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
+import { leadRoutes } from "./modules/leads/lead.routes.js";
 import { userRoutes } from "./modules/users/user.routes.js";
 
 export const app = express();
@@ -26,8 +27,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
-// Additional feature routes are mounted here, e.g.:
-// app.use("/api/v1/leads", leadRoutes);
+app.use("/api/v1/leads", leadRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

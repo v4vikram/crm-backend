@@ -8,6 +8,12 @@ export const updateUserProfile = (id: string, data: { name: string; email: strin
 export const updateUserPassword = (id: string, passwordHash: string) =>
   prisma.user.update({ where: { id }, data: { passwordHash } });
 
+export const findAssignableUsers = () =>
+  prisma.user.findMany({
+    select: { id: true, name: true, email: true },
+    orderBy: { name: "asc" },
+  });
+
 export const findManyUsers = async ({ page, limit, search, role }: ListUsersQuery) => {
   const where: Prisma.UserWhereInput = {
     ...(role ? { role } : {}),

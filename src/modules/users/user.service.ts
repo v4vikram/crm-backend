@@ -7,7 +7,12 @@ import { ApiError } from "../../utils/ApiError.js";
 import { findUserByEmail, findUserById } from "../auth/auth.repository.js";
 import { toSafeUser } from "../auth/auth.service.js";
 import type { SafeUser } from "../auth/auth.types.js";
-import { findManyUsers, updateUserPassword, updateUserProfile } from "./user.repository.js";
+import {
+  findAssignableUsers,
+  findManyUsers,
+  updateUserPassword,
+  updateUserProfile,
+} from "./user.repository.js";
 import type { ChangePasswordDto, ListUsersQuery, UpdateProfileDto } from "./user.types.js";
 
 export const updateProfile = async (userId: string, dto: UpdateProfileDto): Promise<SafeUser> => {
@@ -34,6 +39,8 @@ export const changePassword = async (userId: string, dto: ChangePasswordDto): Pr
   const passwordHash = await bcrypt.hash(dto.newPassword, APP_CONSTANTS.BCRYPT_SALT_ROUNDS);
   await updateUserPassword(userId, passwordHash);
 };
+
+export const listAssignableUsers = () => findAssignableUsers();
 
 export const listUsers = async (query: ListUsersQuery): Promise<PaginatedResult<SafeUser>> => {
   const { items, total } = await findManyUsers(query);
