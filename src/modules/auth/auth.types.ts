@@ -36,4 +36,5 @@ export interface SafeUser {
   name: string;
   email: string;
   role: Role;
+  createdAt: Date;
 }

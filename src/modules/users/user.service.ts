@@ -2,12 +2,13 @@ import bcrypt from "bcrypt";
 import { APP_CONSTANTS } from "../../constants/APP_CONSTANTS.js";
 import { ERROR_MESSAGES } from "../../constants/ERROR_MESSAGES.js";
 import { HTTP_STATUS } from "../../constants/HTTP_STATUS.js";
+import type { PaginatedResult } from "../../types/api.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { findUserByEmail, findUserById } from "../auth/auth.repository.js";
 import { toSafeUser } from "../auth/auth.service.js";
 import type { SafeUser } from "../auth/auth.types.js";
-import { updateUserPassword, updateUserProfile } from "./user.repository.js";
-import type { ChangePasswordDto, UpdateProfileDto } from "./user.types.js";
+import { findManyUsers, updateUserPassword, updateUserProfile } from "./user.repository.js";
+import type { ChangePasswordDto, ListUsersQuery, UpdateProfileDto } from "./user.types.js";
 
 export const updateProfile = async (userId: string, dto: UpdateProfileDto): Promise<SafeUser> => {
   const existing = await findUserByEmail(dto.email);
@@ -32,4 +33,18 @@ export const changePassword = async (userId: string, dto: ChangePasswordDto): Pr
 
   const passwordHash = await bcrypt.hash(dto.newPassword, APP_CONSTANTS.BCRYPT_SALT_ROUNDS);
   await updateUserPassword(userId, passwordHash);
+};
+
+export const listUsers = async (query: ListUsersQuery): Promise<PaginatedResult<SafeUser>> => {
+  const { items, total } = await findManyUsers(query);
+
+  return {
+    items: items.map(toSafeUser),
+    meta: {
+      page: query.page,
+      limit: query.limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / query.limit)),
+    },
+  };
 };

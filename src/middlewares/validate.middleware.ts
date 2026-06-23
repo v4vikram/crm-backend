@@ -31,6 +31,15 @@ export const validate =
     }
 
     if (result.data.body !== undefined) req.body = result.data.body;
-    if (result.data.query !== undefined) req.query = result.data.query as Request["query"];
+    if (result.data.query !== undefined) {
+      // Express 5 defines req.query as a getter-only property, so a plain
+      // assignment silently no-ops. Redefine it as a writable data property.
+      Object.defineProperty(req, "query", {
+        value: result.data.query,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+    }
     next();
   };

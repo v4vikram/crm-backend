@@ -27,11 +27,18 @@ import type {
   SafeUser,
 } from "./auth.types.js";
 
-export const toSafeUser = (user: { id: string; name: string; email: string; role: Role }): SafeUser => ({
+export const toSafeUser = (user: {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  createdAt: Date;
+}): SafeUser => ({
   id: user.id,
   name: user.name,
   email: user.email,
   role: user.role,
+  createdAt: user.createdAt,
 });
 
 const generateTokens = (payload: JwtPayload): AuthTokens => {
