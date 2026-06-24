@@ -4,10 +4,22 @@ import { logger } from "../config/logger.js";
 
 const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
-  port: env.SMTP_PORT,
-  secure: env.SMTP_PORT === 465,
-  auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+  port: Number(env.SMTP_PORT),
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: env.SMTP_USER,
+    pass: env.SMTP_PASS,
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+
+  // Force IPv4
+  family: 4,
 });
+await transporter.verify();
+logger.info("SMTP connected");
 
 const sendMail = async (to: string, subject: string, html: string): Promise<void> => {
   await transporter.sendMail({ from: env.SMTP_FROM, to, subject, html });
