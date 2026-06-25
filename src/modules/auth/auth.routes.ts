@@ -7,19 +7,16 @@ import {
   logoutHandler,
   meHandler,
   refreshHandler,
-  registerHandler,
   resetPasswordHandler,
 } from "./auth.controller.js";
 import {
   forgotPasswordSchema,
   loginSchema,
-  registerSchema,
   resetPasswordSchema,
 } from "./auth.validation.js";
 
 export const authRoutes = Router();
 
-authRoutes.post("/register", validate(registerSchema), registerHandler);
 authRoutes.post("/login", validate(loginSchema), loginHandler);
 authRoutes.post("/refresh", refreshHandler);
 authRoutes.post("/logout", logoutHandler);

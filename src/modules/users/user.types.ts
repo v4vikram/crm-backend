@@ -1,8 +1,21 @@
 import type { Role } from "../../constants/ROLES.js";
 
+export interface CreateUserDto {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+}
+
 export interface UpdateProfileDto {
   name: string;
   email: string;
+}
+
+export interface UpdateUserDto {
+  name?: string;
+  email?: string;
+  role?: Role;
 }
 
 export interface ChangePasswordDto {

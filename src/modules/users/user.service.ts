@@ -8,12 +8,38 @@ import { findUserByEmail, findUserById } from "../auth/auth.repository.js";
 import { toSafeUser } from "../auth/auth.service.js";
 import type { SafeUser } from "../auth/auth.types.js";
 import {
+  createUser as createUserRecord,
+  deleteUserById,
   findAssignableUsers,
   findManyUsers,
+  updateUserById,
   updateUserPassword,
   updateUserProfile,
 } from "./user.repository.js";
-import type { ChangePasswordDto, ListUsersQuery, UpdateProfileDto } from "./user.types.js";
+import type {
+  ChangePasswordDto,
+  CreateUserDto,
+  ListUsersQuery,
+  UpdateProfileDto,
+  UpdateUserDto,
+} from "./user.types.js";
+
+export const createUser = async (dto: CreateUserDto): Promise<SafeUser> => {
+  const existing = await findUserByEmail(dto.email);
+  if (existing) {
+    throw new ApiError(HTTP_STATUS.CONFLICT, "Email is already registered");
+  }
+
+  const passwordHash = await bcrypt.hash(dto.password, APP_CONSTANTS.BCRYPT_SALT_ROUNDS);
+  const user = await createUserRecord({
+    name: dto.name,
+    email: dto.email,
+    passwordHash,
+    role: dto.role,
+  });
+
+  return toSafeUser(user);
+};
 
 export const updateProfile = async (userId: string, dto: UpdateProfileDto): Promise<SafeUser> => {
   const existing = await findUserByEmail(dto.email);
@@ -38,6 +64,39 @@ export const changePassword = async (userId: string, dto: ChangePasswordDto): Pr
 
   const passwordHash = await bcrypt.hash(dto.newPassword, APP_CONSTANTS.BCRYPT_SALT_ROUNDS);
   await updateUserPassword(userId, passwordHash);
+};
+
+export const getUserById = async (id: string): Promise<SafeUser> => {
+  const user = await findUserById(id);
+  if (!user) {
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
+  }
+  return toSafeUser(user);
+};
+
+export const updateUser = async (id: string, dto: UpdateUserDto): Promise<SafeUser> => {
+  const existing = await findUserById(id);
+  if (!existing) {
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
+  }
+
+  if (dto.email) {
+    const emailOwner = await findUserByEmail(dto.email);
+    if (emailOwner && emailOwner.id !== id) {
+      throw new ApiError(HTTP_STATUS.CONFLICT, "Email is already registered");
+    }
+  }
+
+  const user = await updateUserById(id, dto);
+  return toSafeUser(user);
+};
+
+export const deleteUser = async (id: string): Promise<void> => {
+  const existing = await findUserById(id);
+  if (!existing) {
+    throw new ApiError(HTTP_STATUS.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
+  }
+  await deleteUserById(id);
 };
 
 export const listAssignableUsers = () => findAssignableUsers();

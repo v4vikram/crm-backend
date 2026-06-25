@@ -8,7 +8,7 @@ const assigneeInclude = {
   createdBy: { select: { id: true, name: true, email: true } },
 } satisfies Prisma.LeadInclude;
 
-const scopeFilter = (scope: LeadScope): Prisma.LeadWhereInput =>
+export const scopeFilter = (scope: LeadScope): Prisma.LeadWhereInput =>
   scope.role === ROLES.ADMIN
     ? {}
     : { OR: [{ assignedToId: scope.userId }, { createdById: scope.userId }] };

@@ -10,7 +10,6 @@ import { sendPasswordResetEmail } from "../../lib/mailer.js";
 import { ApiError } from "../../utils/ApiError.js";
 import {
   clearPasswordResetToken,
-  createUser,
   findUserByEmail,
   findUserByResetToken,
   findUserById,
@@ -22,7 +21,6 @@ import type {
   ForgotPasswordDto,
   JwtPayload,
   LoginDto,
-  RegisterDto,
   ResetPasswordDto,
   SafeUser,
 } from "./auth.types.js";
@@ -49,23 +47,6 @@ const generateTokens = (payload: JwtPayload): AuthTokens => {
     expiresIn: APP_CONSTANTS.REFRESH_TOKEN_EXPIRY,
   });
   return { accessToken, refreshToken };
-};
-
-export const register = async (
-  dto: RegisterDto,
-): Promise<{ user: SafeUser; tokens: AuthTokens }> => {
-  const existing = await findUserByEmail(dto.email);
-  if (existing) {
-    throw new ApiError(HTTP_STATUS.CONFLICT, "Email is already registered");
-  }
-
-  const passwordHash = await bcrypt.hash(dto.password, APP_CONSTANTS.BCRYPT_SALT_ROUNDS);
-  const user = await createUser({ name: dto.name, email: dto.email, passwordHash });
-
-  const safeUser = toSafeUser(user);
-  const tokens = generateTokens({ sub: user.id, email: user.email, role: safeUser.role });
-
-  return { user: safeUser, tokens };
 };
 
 export const login = async (

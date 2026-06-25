@@ -9,7 +9,6 @@ import { findUserById } from "./auth.repository.js";
 import {
   login,
   refreshAccessToken,
-  register,
   requestPasswordReset,
   resetPassword,
   toSafeUser,
@@ -19,19 +18,6 @@ import type { AuthTokens } from "./auth.types.js";
 const setRefreshCookie = (res: Response, tokens: AuthTokens): void => {
   res.cookie(APP_CONSTANTS.REFRESH_TOKEN_COOKIE, tokens.refreshToken, COOKIE_OPTIONS);
 };
-
-export const registerHandler = asyncHandler(async (req: Request, res: Response) => {
-  const { user, tokens } = await register(req.body);
-  setRefreshCookie(res, tokens);
-  res
-    .status(HTTP_STATUS.CREATED)
-    .json(
-      new ApiResponse(HTTP_STATUS.CREATED, "Registered successfully", {
-        user,
-        accessToken: tokens.accessToken,
-      }),
-    );
-});
 
 export const loginHandler = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await login(req.body);
