@@ -18,6 +18,7 @@ const envSchema = z.object({
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
+  GROQ_API_KEY: z.string().min(1, "GROQ_API_KEY is required"),
 });
 
 const parsed = envSchema.safeParse(process.env);

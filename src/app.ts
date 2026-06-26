@@ -7,6 +7,7 @@ import { corsOptions } from "./config/cors.js";
 import { httpLogger } from "./config/logger.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
+import { aiRoutes } from "./modules/ai/ai.routes.js";
 import { analyticsRoutes } from "./modules/analytics/analytics.routes.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { customerRoutes } from "./modules/customers/customer.routes.js";
@@ -44,6 +45,7 @@ app.use("/api/v1/leads", leadRoutes);
 app.use("/api/v1/customers", customerRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/ai", aiRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

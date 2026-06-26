@@ -26,6 +26,13 @@ export const findUserIdsByRole = async (role: Role): Promise<string[]> => {
   return users.map((user) => user.id);
 };
 
+export const findUsersBasicByRole = (role: Role) =>
+  prisma.user.findMany({
+    where: { role },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
 export const findAssignableUsers = () =>
   prisma.user.findMany({
     select: { id: true, name: true, email: true },

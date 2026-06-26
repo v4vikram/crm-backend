@@ -24,7 +24,11 @@ export const findLeadById = (id: string, scope: LeadScope) =>
   });
 
 export const updateLead = (id: string, dto: UpdateLeadDto) =>
-  prisma.lead.update({ where: { id }, data: dto, include: assigneeInclude });
+  prisma.lead.update({
+    where: { id },
+    data: { ...dto, lastContactedAt: new Date() },
+    include: assigneeInclude,
+  });
 
 export const softDeleteLead = (id: string) =>
   prisma.lead.update({ where: { id }, data: { deletedAt: new Date() } });
