@@ -17,5 +17,5 @@ export const APP_CONSTANTS = {
 export const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: isProd,
-  sameSite: "strict",
+  sameSite: isProd ? "none" : "lax",
 } as const;

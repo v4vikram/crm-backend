@@ -1,6 +1,7 @@
 import { ERROR_MESSAGES } from "../../constants/ERROR_MESSAGES.js";
 import { HTTP_STATUS } from "../../constants/HTTP_STATUS.js";
 import { ApiError } from "../../utils/ApiError.js";
+import { notifyLeadCreated } from "../notifications/notification.service.js";
 import {
   createLead as createLeadRecord,
   findLeadById,
@@ -10,8 +11,11 @@ import {
 } from "./lead.repository.js";
 import type { CreateLeadDto, LeadScope, ListLeadsQuery, UpdateLeadDto } from "./lead.types.js";
 
-export const createLead = (createdById: string, dto: CreateLeadDto) =>
-  createLeadRecord(createdById, dto);
+export const createLead = async (createdById: string, dto: CreateLeadDto) => {
+  const lead = await createLeadRecord(createdById, dto);
+  await notifyLeadCreated(lead);
+  return lead;
+};
 
 export const getLeadById = async (id: string, scope: LeadScope) => {
   const lead = await findLeadById(id, scope);

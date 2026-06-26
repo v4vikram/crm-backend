@@ -10,6 +10,7 @@ import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
 import { analyticsRoutes } from "./modules/analytics/analytics.routes.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { leadRoutes } from "./modules/leads/lead.routes.js";
+import { notificationRoutes } from "./modules/notifications/notification.routes.js";
 import { userRoutes } from "./modules/users/user.routes.js";
 
 export const app = express();
@@ -40,6 +41,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/leads", leadRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

@@ -37,6 +37,10 @@ enum LeadStatus {
   LOST
 }
 
+enum NotificationType {
+  LEAD_CREATED
+}
+
 model User {
   id                   String    @id @default(uuid())
   name                 String
@@ -48,8 +52,9 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  assignedLeads Lead[] @relation("LeadAssignedTo")
-  createdLeads  Lead[] @relation("LeadCreatedBy")
+  assignedLeads Lead[]         @relation("LeadAssignedTo")
+  createdLeads  Lead[]         @relation("LeadCreatedBy")
+  notifications Notification[]
 
   @@map("users")
 }
@@ -77,4 +82,21 @@ model Lead {
   @@index([source])
   @@index([createdAt])
   @@map("leads")
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id])
+  type       NotificationType
+  title      String
+  message    String
+  entityType String?
+  entityId   String?
+  isRead     Boolean          @default(false)
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@map("notifications")
 }

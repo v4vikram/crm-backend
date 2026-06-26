@@ -21,6 +21,11 @@ export const deleteUserById = (id: string) => prisma.user.delete({ where: { id }
 
 export const countUsersByRole = () => prisma.user.groupBy({ by: ["role"], _count: { _all: true } });
 
+export const findUserIdsByRole = async (role: Role): Promise<string[]> => {
+  const users = await prisma.user.findMany({ where: { role }, select: { id: true } });
+  return users.map((user) => user.id);
+};
+
 export const findAssignableUsers = () =>
   prisma.user.findMany({
     select: { id: true, name: true, email: true },
