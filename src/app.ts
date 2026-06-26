@@ -9,6 +9,7 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
 import { analyticsRoutes } from "./modules/analytics/analytics.routes.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
+import { customerRoutes } from "./modules/customers/customer.routes.js";
 import { leadRoutes } from "./modules/leads/lead.routes.js";
 import { notificationRoutes } from "./modules/notifications/notification.routes.js";
 import { userRoutes } from "./modules/users/user.routes.js";
@@ -40,6 +41,7 @@ app.get("/ip", async (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/leads", leadRoutes);
+app.use("/api/v1/customers", customerRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
 

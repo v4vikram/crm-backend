@@ -41,6 +41,12 @@ enum NotificationType {
   LEAD_CREATED
 }
 
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+  CHURNED
+}
+
 model User {
   id                   String    @id @default(uuid())
   name                 String
@@ -52,9 +58,11 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  assignedLeads Lead[]         @relation("LeadAssignedTo")
-  createdLeads  Lead[]         @relation("LeadCreatedBy")
-  notifications Notification[]
+  assignedLeads     Lead[]         @relation("LeadAssignedTo")
+  createdLeads      Lead[]         @relation("LeadCreatedBy")
+  assignedCustomers Customer[]     @relation("CustomerAssignedTo")
+  createdCustomers  Customer[]     @relation("CustomerCreatedBy")
+  notifications     Notification[]
 
   @@map("users")
 }
@@ -77,11 +85,39 @@ model Lead {
   updatedAt    DateTime   @updatedAt
   deletedAt    DateTime?
 
+  customer Customer?
+
   @@index([assignedToId])
   @@index([status])
   @@index([source])
   @@index([createdAt])
   @@map("leads")
+}
+
+model Customer {
+  id           String         @id @default(uuid())
+  companyName  String?
+  contactName  String
+  email        String?
+  phone        String?
+  address      String?
+  dealValue    Float?
+  status       CustomerStatus @default(ACTIVE)
+  remarks      String?
+  assignedToId String?
+  assignedTo   User?          @relation("CustomerAssignedTo", fields: [assignedToId], references: [id])
+  createdById  String
+  createdBy    User           @relation("CustomerCreatedBy", fields: [createdById], references: [id])
+  leadId       String         @unique
+  lead         Lead           @relation(fields: [leadId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("customers")
 }
 
 model Notification {
