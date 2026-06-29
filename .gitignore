@@ -18,3 +18,5 @@ uploads/*
 
 # Prisma generated client (if you use a custom output)
 src/generated/prisma/
+postman*
+.postman

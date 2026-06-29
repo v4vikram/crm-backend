@@ -6,7 +6,6 @@ declare global {
       DATABASE_URL: string;
       JWT_SECRET: string;
       JWT_REFRESH_SECRET: string;
-      REDIS_URL: string;
       CORS_ORIGIN?: string;
       LOG_LEVEL?: string;
     }

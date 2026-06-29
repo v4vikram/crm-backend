@@ -4,4 +4,5 @@ export const ERROR_MESSAGES = {
   UNAUTHORIZED: "You are not authorized to access this resource.",
   FORBIDDEN: "You do not have permission to perform this action.",
   VALIDATION_ERROR: "Invalid input data.",
+  TOO_MANY_REQUESTS: "Too many requests. Please try again later.",
 } as const;

@@ -7,6 +7,8 @@ import { corsOptions } from "./config/cors.js";
 import { httpLogger } from "./config/logger.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware.js";
+import { apiLimiter } from "./middlewares/rateLimit.middleware.js";
+
 import { aiRoutes } from "./modules/ai/ai.routes.js";
 import { analyticsRoutes } from "./modules/analytics/analytics.routes.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
@@ -25,19 +27,12 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(httpLogger);
 
+
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
-app.get("/ip", async (req, res) => {
-  try {
-    const response = await fetch("https://api.ipify.org?format=json");
-    const data = await response.json();
 
-    res.json(data);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+app.use("/api/v1", apiLimiter);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
